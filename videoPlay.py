@@ -76,14 +76,15 @@ def videoPrediction(classes_dct, model, gesture_id):
     data = torch.cat(imgs)
     data = data.permute(1, 0, 2, 3)
     data = torch.unsqueeze(data, 0)
+	
+    with torch.no_grad():
+    	input= data.to(device)
 
-    input= data.to(device)
+    	# compute output and loss
+    	output = model(input)
 
-    # compute output and loss
-    output = model(input)
-
-    _, predicted = torch.max(output.data, 1)
-    predicted = predicted.detach().cpu().numpy()
+    	_, predicted = torch.max(output.data, 1)
+    	predicted = predicted.detach().cpu().numpy()
 
     #print(window_name)
     window_name = classes_dct[int(predicted)]
@@ -100,6 +101,7 @@ def videoPrediction(classes_dct, model, gesture_id):
             break
             
     cv2.destroyWindow(window_name)
+    torch.cuda.empty_cache()
 
 
 
@@ -145,13 +147,15 @@ def play_video(classes_dct, model, video, fps = 20):
             data = torch.cat(imgs)
             data = data.permute(1, 0, 2, 3)
             data = torch.unsqueeze(data, 0)
-            input= data.to(device)
+            
+            with torch.no_grad():
+            	input= data.to(device)
 
-            # compute output and loss
-            output = model(input)
+            	# compute output and loss
+            	output = model(input)
 
-            _, predicted = torch.max(output.data, 1)
-            predicted = predicted.detach().cpu().numpy()
+            	_, predicted = torch.max(output.data, 1)
+            	predicted = predicted.detach().cpu().numpy()
 
             #print(window_name)
             print(classes_dct[int(predicted)])
@@ -161,6 +165,7 @@ def play_video(classes_dct, model, video, fps = 20):
             
     cv2.destroyWindow('Video')
     vid.release()
+    torch.cuda.empty_cache()
 
 
 
